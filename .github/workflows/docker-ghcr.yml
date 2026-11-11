@@ -115,3 +115,17 @@ jobs:
 
       - name: Confere o manifesto
         run: docker buildx imagetools inspect ${{ env.IMAGE }}:main
+
+      # Dispara o deploy no Easy Panel. Sem o secret, o passo é pulado.
+      # Se o Easy Panel não responder, o job falha (e o GitHub avisa por e-mail);
+      # a imagem já está publicada, então dá para redeployar à mão.
+      - name: Redeploy no Easy Panel
+        env:
+          WEBHOOK: ${{ secrets.EASYPANEL_DEPLOY_WEBHOOK }}
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "EASYPANEL_DEPLOY_WEBHOOK não configurado; redeploy pulado."
+            exit 0
+          fi
+          curl -fsS -X POST --retry 3 --retry-delay 10 --max-time 60 "$WEBHOOK" -o /dev/null
+          echo "Redeploy disparado."
