@@ -129,3 +129,18 @@ jobs:
           fi
           curl -fsS -X POST --retry 3 --retry-delay 10 --max-time 60 "$WEBHOOK" -o /dev/null
           echo "Redeploy disparado."
+
+      # Dispara também o deploy no Coolify (urzum.vps). Os dois ficam ativos.
+      # Sem os secrets, o passo é pulado. Token do Coolify só com permissão "deploy".
+      - name: Redeploy no Coolify if: ${{ !cancelled() }}
+        env:
+          COOLIFY_URL: ${{ secrets.COOLIFY_DEPLOY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$COOLIFY_URL" ] || [ -z "$COOLIFY_TOKEN" ]; then
+            echo "COOLIFY_DEPLOY_URL/COOLIFY_DEPLOY_TOKEN não configurados; redeploy pulado."
+            exit 0
+          fi
+          curl -fsS -X POST --retry 3 --retry-delay 10 --max-time 60 \
+            -H "Authorization: Bearer $COOLIFY_TOKEN" "$COOLIFY_URL" -o /dev/null
+          echo "Redeploy no Coolify disparado."
