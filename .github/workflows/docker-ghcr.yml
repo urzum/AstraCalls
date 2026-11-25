@@ -132,7 +132,8 @@ jobs:
 
       # Dispara também o deploy no Coolify (urzum.vps). Os dois ficam ativos.
       # Sem os secrets, o passo é pulado. Token do Coolify só com permissão "deploy".
-      - name: Redeploy no Coolify if: ${{ !cancelled() }}
+      - name: Redeploy no Coolify
+        if: ${{ !cancelled() }}
         env:
           COOLIFY_URL: ${{ secrets.COOLIFY_DEPLOY_URL }}
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_DEPLOY_TOKEN }}
