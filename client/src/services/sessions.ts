@@ -74,6 +74,14 @@ export const getSIPExt = (id: string) =>
 export const setSIPExt = (id: string, cfg: Omit<SIPExtConfig, "status" | "error" | "advertise">) =>
   apiPost<{ status: string }>(`/api/sessions/${id}/sip-ext`, cfg);
 
+// Opções da conta no WhatsApp (GET/PUT /options).
+export type SessionOptions = { read_messages: boolean; always_online: boolean };
+
+export const getOptions = (id: string) => apiGet<SessionOptions>(`/api/sessions/${id}/options`);
+
+export const setOptions = (id: string, opts: SessionOptions) =>
+  apiPut<SessionOptions>(`/api/sessions/${id}/options`, opts);
+
 export const setProxy = async (id: string, proxy: string): Promise<void> => {
   const r = await fetch(apiUrl(`/api/sessions/${id}/proxy`), {
     method: "PUT",
